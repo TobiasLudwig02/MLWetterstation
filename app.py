@@ -1,27 +1,32 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from sqlalchemy import create_engine
-import urllib
+from sqlalchemy.engine.url import URL
 from dotenv import load_dotenv
 import os
 
 # Laden der Umgebungsvariablen aus der .env Datei
 load_dotenv()
 
-# Azure SQL-Datenbankverbindungsinformationen aus Umgebungsvariablen
-server = os.getenv('SERVER')
-database = os.getenv('DATABASE')
-username = os.getenv('USERNAME')
-password = os.getenv('PASSWORD')
+# PostgreSQL-Verbindungszeichenfolge aus der Umgebungsvariable
+conn_str = os.getenv('AZURE_POSTGRESQL_CONNECTIONSTRING')
 
-# Verbindungszeichenfolge für SQLAlchemy
-connection_string = f"mssql+pyodbc:///?odbc_connect=" + urllib.parse.quote_plus(
-    f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
+# Konvertieren der Verbindungszeichenfolge in ein URL-Objekt für SQLAlchemy
+conn_url = URL.create(
+    drivername='postgresql+psycopg2',
+    database=None,  # database is already included in the connection string
+    query=dict(
+        dbname=conn_str.split(' ')[0].split('=')[1],
+        host=conn_str.split(' ')[1].split('=')[1],
+        port=conn_str.split(' ')[2].split('=')[1],
+        sslmode=conn_str.split(' ')[3].split('=')[1],
+        user=conn_str.split(' ')[4].split('=')[1],
+        password=conn_str.split(' ')[5].split('=')[1],
+    )
 )
 
-# Verbindung zur temporären SQLite-Datenbank herstellen
-engine = create_engine('sqlite:///weather_data.db')
+# Verbindung zur Azure PostgreSQL-Datenbank herstellen
+engine = create_engine(conn_url)
 
 # Funktion zum Generieren zufälliger Wetterdaten
 def generate_random_data(num_records=100):
