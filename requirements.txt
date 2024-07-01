@@ -4,3 +4,4 @@ sqlalchemy
 pyodbc
 python-dotenv
 psycopg2
+numpy
