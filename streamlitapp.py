@@ -1,23 +1,23 @@
 import streamlit as st
-import pandas as pd
 import pyodbc
-from dotenv import load_dotenv
-import os
+import pandas as pd
 
-load_dotenv()  # Lädt Umgebungsvariablen aus .env Datei
+# Datenbankverbindung
+conn = pyodbc.connect(
+    'DRIVER={ODBC Driver 17 for SQL Server};'
+    'SERVER=wetterstation.database.windows.net;'
+    'DATABASE=wetterstation;'
+    'UID=dhbw;'
+    'PWD=Wetterstation1.'
+)
 
-server = os.getenv('SERVER')
-database = os.getenv('DATABASE')
-username = os.getenv('USERNAME')
-password = os.getenv('PASSWORD')
-driver= '{ODBC Driver 17 for SQL Server}'
-
-def get_data():
-    with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password) as conn:
-        query = "SELECT * FROM SensorData"
-        df = pd.read_sql(query, conn)
+# Daten abfragen
+def fetch_data():
+    query = "SELECT * FROM SensorData"
+    df = pd.read_sql(query, conn)
     return df
 
-st.title('Wetterstation Dashboard')
-data = get_data()
-st.line_chart(data['SensorValue'])
+# Streamlit-Anwendung
+st.title("Sensor Data Dashboard")
+data = fetch_data()
+st.write(data)
