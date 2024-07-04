@@ -1,28 +1,27 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import pyodbc
-from dotenv import load_dotenv
-import os
-
-load_dotenv()  # Lädt Umgebungsvariablen aus .env Datei
 
 app = Flask(__name__)
 
-server = os.getenv('SERVER')
-database = os.getenv('DATABASE')
-username = os.getenv('USERNAME')
-password = os.getenv('PASSWORD')
-driver= '{ODBC Driver 17 for SQL Server}'
+# Datenbankverbindung
+conn = pyodbc.connect(
+    'DRIVER={ODBC Driver 17 for SQL Server};'
+    'SERVER=wetterstation.database.windows.net;'
+    'DATABASE=wetterstation;'
+    'UID=dhbw;'
+    'PWD=Wetterstation1.'
+)
 
-@app.route('/api/sensor-data', methods=['POST'])
-def sensor_data():
-    sensor_data = request.get_json()
-    sensor_value = sensor_data.get('sensorValue')
+@app.route('/send_data', methods=['POST'])
+def send_data():
+    data = request.json
+    temperature = data['temperature']
+    humidity = data['humidity']
 
-    with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO SensorData (SensorValue) VALUES (?)", sensor_value)
-
-    return jsonify({'status': 'success', 'data': sensor_data})
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO SensorData (Temperature, Humidity) VALUES (?, ?)", temperature, humidity)
+    conn.commit()
+    return 'Data received and stored', 200
 
 if __name__ == '__main__':
     app.run(debug=True)
