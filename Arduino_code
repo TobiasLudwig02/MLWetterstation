@@ -1,0 +1,44 @@
+#include <DHT.h>
+
+// Definiere den Typ des DHT-Sensors
+#define DHTTYPE DHT11   // DHT22 (AM2302), DHT11, DHT21 (AM2301)
+
+// Definiere den Pin, an dem der DHT-Sensor angeschlossen ist
+const int DHTPIN = 5; // GPIO5 (D1)
+
+// Initialisiere den DHT-Sensor
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600); // Starte die serielle Kommunikation
+  dht.begin(); // Starte den DHT-Sensor
+  Serial.println("Setup abgeschlossen");
+}
+
+void loop() {
+  // Lese den analogen Wert vom Pin A0 (LDR)
+  int sensorValue = analogRead(A0); 
+  
+  // Der Wert des LDR variiert normalerweise zwischen 0 (sehr hell) und 1023 (sehr dunkel)
+  Serial.print("Lichtwert: ");
+  Serial.println(sensorValue);
+
+  // Lese die Luftfeuchtigkeit und Temperatur vom DHT-Sensor
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+  
+  // Überprüfe, ob die Messungen gültig sind
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("Fehler beim Lesen des DHT-Sensors!");
+  } else {
+    // Drucke die Ergebnisse
+    Serial.print("Luftfeuchtigkeit: ");
+    Serial.print(humidity);
+    Serial.print(" %\t");
+    Serial.print("Temperatur: ");
+    Serial.print(temperature);
+    Serial.println(" *C");
+  }
+
+  delay(2000); // Warte 2 Sekunden bevor der nächste Wert gelesen wird
+}
