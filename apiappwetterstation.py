@@ -17,9 +17,10 @@ def send_data():
     data = request.json
     temperature = data['temperature']
     humidity = data['humidity']
+    light = data['light']
 
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO SensorData (Temperature, Humidity) VALUES (?, ?)", temperature, humidity)
+    cursor.execute("INSERT INTO Weatherdata (Temperature, Humidity, Light) VALUES (?, ?, ?)", temperature, humidity, light)
     conn.commit()
     return 'Data received and stored', 200
 

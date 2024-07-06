@@ -13,7 +13,7 @@ conn = pyodbc.connect(
 
 # Daten abfragen
 def fetch_data():
-    query = "SELECT * FROM SensorData"
+    query = "SELECT * FROM Weatherdata"
     df = pd.read_sql(query, conn)
     return df
 
