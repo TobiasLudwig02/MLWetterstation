@@ -64,23 +64,26 @@ st.subheader("Lichtintensität über die Zeit")
 fig, ax = plt.subplots()
 ax.plot(data['Timestamp'], data['Light'], label='Lichtintensität', color='green')
 ax.set_xlabel('Zeit')
-ax.set_ylabel('Lichtintensität (Lux)')
+ax.set_ylabel('Lichtintensität (Ohm)')
 ax.legend()
 st.pyplot(fig)
 
 # Alle Werte gleichzeitig anzeigen
 st.subheader("Alle Werte gleichzeitig")
 
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax1 = plt.subplots(figsize=(10, 6))
 
-# Temperatur
-ax.plot(data['Timestamp'], data['Temperature'], label='Temperatur (°C)', color='red')
-# Luftfeuchtigkeit
-ax.plot(data['Timestamp'], data['Humidity'], label='Luftfeuchtigkeit (%)', color='blue')
-# Lichtintensität
-ax.plot(data['Timestamp'], data['Light'], label='Lichtintensität (Lux)', color='green')
+# Temperatur und Luftfeuchtigkeit
+ax1.plot(data['Timestamp'], data['Temperature'], label='Temperatur (°C)', color='red')
+ax1.plot(data['Timestamp'], data['Humidity'], label='Luftfeuchtigkeit (%)', color='blue')
+ax1.set_xlabel('Zeit')
+ax1.set_ylabel('Temperatur (°C) und Luftfeuchtigkeit (%)')
+ax1.legend(loc='upper left')
 
-ax.set_xlabel('Zeit')
-ax.set_ylabel('Werte')
-ax.legend()
+# Zweite y-Achse für Lichtintensität
+ax2 = ax1.twinx()
+ax2.plot(data['Timestamp'], data['Light'], label='Lichtintensität (Ohm)', color='green')
+ax2.set_ylabel('Lichtintensität (Ohm)')
+ax2.legend(loc='upper right')
+
 st.pyplot(fig)
