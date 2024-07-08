@@ -2,8 +2,9 @@ import requests
 
 url = "http://apiappwetterstation.azurewebsites.net/send_data"
 data = {
-    "temperature": 24.5,
-    "humidity": 60
+    "temperature": 24,
+    "humidity": 68,
+    "light": 32
 }
 
 response = requests.post(url, json=data)

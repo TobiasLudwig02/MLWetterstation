@@ -3,3 +3,4 @@ python-dotenv
 pyodbc
 pandas
 streamlit
+matplotlib
