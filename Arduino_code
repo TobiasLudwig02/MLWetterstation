@@ -4,7 +4,7 @@
 
 // Replace these with your network credentials
 const char* ssid = "FRITZ!Box 6660 Cable LB";
-const char* password = "26012463911968262936";
+const char* password = "###"
 
 // Your domain name with URL path or IP address with path
 const char* serverName = "http://apiappwetterstation.azurewebsites.net/send_data";
