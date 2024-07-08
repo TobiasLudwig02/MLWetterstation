@@ -1,44 +1,98 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include <DHT.h>
 
-// Definiere den Typ des DHT-Sensors
+// Replace these with your network credentials
+const char* ssid = "FRITZ!Box 6660 Cable LB";
+const char* password = "26012463911968262936";
+
+// Your domain name with URL path or IP address with path
+const char* serverName = "http://apiappwetterstation.azurewebsites.net/send_data";
+
+// Define the type of DHT sensor
 #define DHTTYPE DHT11   // DHT22 (AM2302), DHT11, DHT21 (AM2301)
 
-// Definiere den Pin, an dem der DHT-Sensor angeschlossen ist
+// Define the pin where the DHT sensor is connected
 const int DHTPIN = 5; // GPIO5 (D1)
 
-// Initialisiere den DHT-Sensor
+// Initialize the DHT sensor
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  Serial.begin(9600); // Starte die serielle Kommunikation
-  dht.begin(); // Starte den DHT-Sensor
+  Serial.begin(9600); // Start the serial communication
+  dht.begin(); // Start the DHT sensor
   Serial.println("Setup abgeschlossen");
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  Serial.println("Connected to WiFi");
 }
 
 void loop() {
-  // Lese den analogen Wert vom Pin A0 (LDR)
+  // Read the analog value from pin A0 (LDR)
   int sensorValue = analogRead(A0); 
   
-  // Der Wert des LDR variiert normalerweise zwischen 0 (sehr hell) und 1023 (sehr dunkel)
+  // The value of the LDR typically varies between 0 (very bright) and 1023 (very dark)
   Serial.print("Lichtwert: ");
   Serial.println(sensorValue);
 
-  // Lese die Luftfeuchtigkeit und Temperatur vom DHT-Sensor
+  // Read the humidity and temperature from the DHT sensor
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
   
-  // Überprüfe, ob die Messungen gültig sind
+  // Check if the measurements are valid
   if (isnan(humidity) || isnan(temperature)) {
     Serial.println("Fehler beim Lesen des DHT-Sensors!");
   } else {
-    // Drucke die Ergebnisse
+    // Print the results
     Serial.print("Luftfeuchtigkeit: ");
     Serial.print(humidity);
     Serial.print(" %\t");
     Serial.print("Temperatur: ");
     Serial.print(temperature);
     Serial.println(" *C");
+
+    // Check WiFi connection status
+    if (WiFi.status() == WL_CONNECTED) {
+      WiFiClient client;
+      HTTPClient http;
+
+      // Specify request destination
+      http.begin(client, serverName);
+
+      // Specify content-type header
+      http.addHeader("Content-Type", "application/json");
+
+      // Data to send with HTTP POST
+      String httpRequestData = "{\"temperature\":\"" + String(temperature) + "\",\"humidity\":\"" + String(humidity) + "\",\"light\":\"" + String(sensorValue) + "\"}";
+      
+      // Send HTTP POST request
+      int httpResponseCode = http.POST(httpRequestData);
+
+      // If the POST request is successful, print the response
+      if (httpResponseCode > 0) {
+        String response = http.getString();
+        Serial.println(httpResponseCode);
+        Serial.println(response);
+      } else {
+        Serial.print("Error on sending POST: ");
+        Serial.println(httpResponseCode);
+      }
+
+      // Free resources
+      http.end();
+    } else {
+      Serial.println("WiFi Disconnected");
+    }
   }
 
-  delay(2000); // Warte 2 Sekunden bevor der nächste Wert gelesen wird
+  // Send a request every 10 seconds
+  delay(10000);
 }
