@@ -14,27 +14,31 @@ conn = pyodbc.connect(
     'PWD=Wetterstation1.'
 )
 
-# Daten abfragen
+# Daten der letzten 24h abfragen
 def fetch_data():
-    query = "SELECT * FROM Weatherdata"
+    query = """
+    SELECT *
+    FROM Weatherdata
+    WHERE Timestamp >= DATEADD(day, -1, SYSDATETIME()) 
+    """
     df = pd.read_sql(query, conn)
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
     return df
 
-# Streamlit-Anwendung
+# Titel der Streamlit-Anwendung
 st.title("Wetterstation Dashboard")
 
 # Daten laden
 data = fetch_data()
 
-# Filter für die letzten 5 Minuten
+# Filter für die letzten 5 Minuten für die KPIs
 now = datetime.now()
 last_5_minutes = now - timedelta(minutes=5)
 data_last_5_minutes = data[data['Timestamp'] >= last_5_minutes]
 
 st.subheader("Durchschnitt der Metriken der letzten 5 Minuten")
 
-# Metriken
+# KPIs
 col1, col2, col3 = st.columns(3)
 col1.metric("Durchschnittstemperatur (°C)", round(data_last_5_minutes['Temperature'].mean(), 2))
 col2.metric("Durchschnittliche Luftfeuchtigkeit (%)", round(data_last_5_minutes['Humidity'].mean(), 2))
@@ -48,6 +52,9 @@ ax.plot(data['Timestamp'], data['Temperature'], label='Temperatur', color='red')
 ax.set_xlabel('Zeit')
 ax.set_ylabel('Temperatur (°C)')
 ax.legend()
+
+ax.xaxis.set_major_locator(plt.MaxNLocator(10))  # maximal 10 Ticks auf der x-Achse
+
 st.pyplot(fig)
 
 # Luftfeuchtigkeit über die Zeit
@@ -57,6 +64,9 @@ ax.plot(data['Timestamp'], data['Humidity'], label='Luftfeuchtigkeit', color='bl
 ax.set_xlabel('Zeit')
 ax.set_ylabel('Luftfeuchtigkeit (%)')
 ax.legend()
+
+plt.xticks(rotation=45)
+
 st.pyplot(fig)
 
 # Lichtintensität über die Zeit
@@ -66,6 +76,9 @@ ax.plot(data['Timestamp'], data['Light'], label='Lichtintensität', color='green
 ax.set_xlabel('Zeit')
 ax.set_ylabel('Lichtintensität (Ohm)')
 ax.legend()
+
+fig.autofmt_xdate()
+
 st.pyplot(fig)
 
 # Alle Werte gleichzeitig anzeigen
