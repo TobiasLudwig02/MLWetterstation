@@ -34,7 +34,7 @@ data = fetch_data()
 
 # Filter für die letzten 5 Minuten für die KPIs
 now = datetime.now()
-last_5_minutes = now - timedelta(minutes=5)
+last_5_minutes = pd.Timestamp.now() - pd.Timedelta(minutes=5)
 data_last_5_minutes = data[data['Timestamp'] >= last_5_minutes]
 
 st.subheader("Durchschnitt der Metriken der letzten 5 Minuten")
