@@ -23,6 +23,7 @@ def fetch_data():
     """
     df = pd.read_sql(query, conn)
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    df['Timestamp'] = df['Timestamp'].dt.strftime('%d-%m %H:%M')
     return df
 
 # Titel der Streamlit-Anwendung
@@ -53,7 +54,7 @@ ax.set_xlabel('Zeit')
 ax.set_ylabel('Temperatur (°C)')
 ax.legend()
 
-ax.xaxis.set_major_locator(plt.MaxNLocator(10))  # maximal 10 Ticks auf der x-Achse
+plt.xticks(rotation=45)
 
 st.pyplot(fig)
 
@@ -77,7 +78,7 @@ ax.set_xlabel('Zeit')
 ax.set_ylabel('Lichtintensität (Ohm)')
 ax.legend()
 
-fig.autofmt_xdate()
+plt.xticks(rotation=45)
 
 st.pyplot(fig)
 
@@ -98,5 +99,7 @@ ax2 = ax1.twinx()
 ax2.plot(data['Timestamp'], data['Light'], label='Lichtintensität (Ohm)', color='green')
 ax2.set_ylabel('Lichtintensität (Ohm)')
 ax2.legend(loc='upper right')
+
+plt.xticks(rotation=45)
 
 st.pyplot(fig)
