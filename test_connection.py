@@ -2,7 +2,7 @@ import requests
 
 url = "http://apiappwetterstation.azurewebsites.net/send_data"
 data = {
-    "temperature": 24,
+    "temperature": 100,
     "humidity": 68,
     "light": 32
 }
