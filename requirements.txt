@@ -1,4 +1,4 @@
-flask==3.03
+flask==3.0.3
 pyodbc==5.1.0
 pandas==2.2.2
 dash==2.17.1
