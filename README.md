@@ -17,3 +17,5 @@ folder models contains the trained models
 train_requirements.txt contains all necessary libs for training
 
 The app should be availible via: streamlitwetterstation.azurewebsites.net
+
+A presentation video is available via: https://youtu.be/Qb1l3KKBpUI![image](https://github.com/user-attachments/assets/f7f3a8b3-7ec5-45c3-bff3-891419735055)
